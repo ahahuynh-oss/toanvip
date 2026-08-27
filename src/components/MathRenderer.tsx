@@ -118,6 +118,9 @@ function renderMixedMathAndMarkdown(rawText: string): string {
   processed = processed.replace(/^\s*-\s+(.*$)/gim, '<li class="ml-4 list-disc text-slate-700">$1</li>');
   processed = processed.replace(/^\s*\*\s+(.*$)/gim, '<li class="ml-4 list-disc text-slate-700">$1</li>');
 
+  // Handle literal \\ as newline if it's left over (outside math)
+  processed = processed.replace(/\\\\/g, '<br/>');
+
   // Paragraph breaks & newlines (excluding inside existing tags)
   const lines = processed.split('\n');
   const formattedLines = lines.map(line => {

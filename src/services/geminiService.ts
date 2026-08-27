@@ -148,7 +148,9 @@ Hãy thiết kế TRỌN BỘ 5 BƯỚC SƯ PHẠM cho chuyên đề bồi dư�
 - Ghi chú bổ sung của giáo viên: ${notes || 'Chuẩn bị cho kỳ thi HSG sắp tới'}
 
 YÊU CẦU ĐỊNH DẠNG:
-Trả về DUY NHẤT một chuỗi JSON hợp lệ (không kèm markdown \`\`\`json bao quanh nếu có thể, hoặc bọc trong \`\`\`json) theo đúng cấu trúc schema sau:
+- TẤT CẢ các công thức toán học, biến số, biểu thức (ví dụ: $x$, $\sqrt{3x+1}$, $x \ge 0$) BẮT BUỘC phải được bọc trong dấu $ (inline) hoặc $$ (display). KHÔNG ĐƯỢC để công thức toán trần trụi giữa văn bản.
+- KHÔNG dùng dấu \\\\ để xuống dòng trong văn bản thường, hãy dùng ký tự xuống dòng (enter/newline) của Markdown. Dấu \\\\ chỉ được dùng bên trong môi trường toán học (như ma trận, hệ phương trình).
+- Trả về DUY NHẤT một chuỗi JSON hợp lệ (không kèm markdown \`\`\`json bao quanh nếu có thể, hoặc bọc trong \`\`\`json) theo đúng cấu trúc schema sau:
 
 {
   "step1Pedagogy": {
@@ -444,7 +446,7 @@ MỨC ĐỘ GỢI Ý YÊU CẦU: Mức ${hintLevel} / 3:
 
 ${studentQuestion ? `CÂU HỎI CỦA HỌC SINH: "${studentQuestion}"` : ''}
 
-Hãy trả lời bằng giọng văn sư phạm truyền cảm hứng, ngắn gọn, súc tích, định dạng công thức LaTeX đẹp mắt.`;
+Hãy trả lời bằng giọng văn sư phạm truyền cảm hứng, ngắn gọn, súc tích. BẮT BUỘC phải bọc toàn bộ công thức toán học, biến số, ký hiệu bằng dấu $ (inline) hoặc $$ (display). Không dùng dấu \\\\ để xuống dòng, hãy dùng newline bình thường.`;
 
   return await callGemini(
     prompt,
@@ -476,7 +478,7 @@ Nhiệm vụ của bạn:
 2. Đối chiếu với đáp án chuẩn.
 3. Nhận xét chi tiết: bước nào đúng, bước nào sai logic, tính toán sai ở đâu.
 4. Chấm điểm trên thang điểm 10.
-Trả về nhận xét dưới dạng văn bản có sử dụng markdown và LaTeX.`;
+Trả về nhận xét dưới dạng văn bản có sử dụng markdown. BẮT BUỘC phải bọc toàn bộ công thức toán học, biến số, ký hiệu bằng dấu $ (inline) hoặc $$ (display). Không dùng dấu \\\\ để xuống dòng, hãy dùng newline bình thường.`;
 
   const attachment = {
     name: 'student_work',
