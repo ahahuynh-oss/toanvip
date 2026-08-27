@@ -159,7 +159,7 @@ export const FullDocumentPreview: React.FC<FullDocumentPreviewProps> = ({
               <div key={ex.id} className="border border-slate-300 rounded-xl p-5 space-y-3 avoid-break">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                   <h3 className="text-sm font-bold text-slate-900">
-                    Bài {ei + 1}: {ex.title}
+                    {ex.title.match(/^Bài\s+\d+:/i) ? ex.title : `Bài ${ei + 1}: ${ex.title}`}
                   </h3>
                   <span className="text-[10px] font-bold uppercase px-2 py-0.5 bg-slate-100 rounded border border-slate-300">
                     {ex.tier === 'tier_1'

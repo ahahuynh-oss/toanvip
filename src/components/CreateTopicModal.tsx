@@ -4,7 +4,7 @@ import { TopicCurriculum, MathBranch, TargetLevel } from '../types/math';
 
 interface CreateTopicModalProps {
   onClose: () => void;
-  onCreateTopic: (newTopic: TopicCurriculum, triggerAiAutoDesign: boolean) => void;
+  onCreateTopic: (newTopic: TopicCurriculum, triggerAiAutoDesign: boolean, imageBase64?: string, mimeType?: string) => void;
   onOpenExamResearchModal?: () => void;
   teacherName: string;
   schoolName: string;
@@ -23,6 +23,27 @@ export const CreateTopicModal: React.FC<CreateTopicModalProps> = ({
   const [mathBranch, setMathBranch] = useState<MathBranch>('algebra');
   const [targetLevel, setTargetLevel] = useState<TargetLevel>('provincial_hsg');
   const [triggerAi, setTriggerAi] = useState<boolean>(true);
+  
+  // Image Upload State
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [imageMimeType, setImageMimeType] = useState<string | null>(null);
+  const [imageFileName, setImageFileName] = useState<string>('');
+
+  const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFileName(file.name);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Data = event.target?.result?.toString().split(',')[1];
+      if (base64Data) {
+        setImageBase64(base64Data);
+        setImageMimeType(file.type);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,7 +112,7 @@ export const CreateTopicModal: React.FC<CreateTopicModalProps> = ({
       auditReports: [],
     };
 
-    onCreateTopic(newTopic, triggerAi);
+    onCreateTopic(newTopic, triggerAi, imageBase64 || undefined, imageMimeType || undefined);
     onClose();
   };
 
@@ -213,11 +234,41 @@ export const CreateTopicModal: React.FC<CreateTopicModalProps> = ({
                 onChange={(e) => setTargetLevel(e.target.value as any)}
                 className="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               >
-                <option value="school_team">HSG Cấp Trường</option>
-                <option value="provincial_hsg">HSG Cấp Tỉnh/Thành</option>
-                <option value="national_vmo">HSG Quốc Gia (VMO)</option>
-                <option value="tst_olympiad">Tuyển Chọn Olympic</option>
+                <option value="school_team">HSG Cấp Trường (Tầng 1)</option>
+                <option value="provincial_hsg">HSG Cấp Tỉnh/Thành (Tầng 2)</option>
+                <option value="thpt_qg_vdc">Ôn thi THPT Quốc Gia VD-VDC (Câu 40-50)</option>
+                <option value="national_vmo">HSG Quốc Gia (VMO) (Tầng 3)</option>
+                <option value="tst_olympiad">Tuyển Chọn Olympic (TST)</option>
               </select>
+            </div>
+          </div>
+
+          {/* Reverse Engineering Image Upload */}
+          <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-xl space-y-2">
+            <div className="flex items-center space-x-2">
+              <div className="p-1.5 bg-indigo-600 text-white rounded-lg">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-xs font-bold text-indigo-900 block">Tạo chuyên đề 5 bước từ Ảnh (Reverse Engineering)</span>
+                <span className="text-[10px] text-indigo-700">Chụp một câu VD/VDC trong đề thi THPT, AI sẽ tự phân rã và thiết kế 5 bước.</span>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleUploadImage}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+              />
+              <div className="w-full text-xs p-3 bg-white border-2 border-dashed border-indigo-300 hover:border-indigo-500 rounded-xl font-semibold text-slate-600 flex justify-center items-center">
+                {imageFileName ? (
+                  <span className="text-indigo-700 truncate max-w-full px-2">Đã chọn: {imageFileName}</span>
+                ) : (
+                  <span>Tải lên ảnh chụp đề bài (Tùy chọn)</span>
+                )}
+              </div>
             </div>
           </div>
 

@@ -15,8 +15,9 @@ export function generateWordDocumentBlob(topic: TopicCurriculum): Blob {
   };
 
   const levelLabels: Record<string, string> = {
-    school_team: 'Đội tuyển Cấp Trường',
-    provincial_hsg: 'Học sinh Giỏi Cấp Tỉnh / Thành Phố',
+    school_team: 'Học sinh Giỏi Cấp Trường',
+    provincial_hsg: 'Học sinh Giỏi Cấp Tỉnh/Thành phố',
+    thpt_qg_vdc: 'Ôn thi THPT Quốc Gia (Mức độ Vận Dụng Cao)',
     national_vmo: 'Học sinh Giỏi Quốc Gia (VMO)',
     tst_olympiad: 'Tuyển chọn Đội tuyển Olympic (TST)',
   };

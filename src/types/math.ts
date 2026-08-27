@@ -4,7 +4,7 @@
 
 export type MathBranch = 'algebra' | 'geometry' | 'number_theory' | 'combinatorics' | 'calculus_sequences';
 
-export type TargetLevel = 'school_team' | 'provincial_hsg' | 'national_vmo' | 'tst_olympiad';
+export type TargetLevel = 'school_team' | 'provincial_hsg' | 'national_vmo' | 'tst_olympiad' | 'thpt_qg_vdc';
 
 export type ExerciseTier = 'tier_1' | 'tier_2' | 'tier_3'; // Tier 1: Foundation | Tier 2: Provincial | Tier 3: National/VMO
 

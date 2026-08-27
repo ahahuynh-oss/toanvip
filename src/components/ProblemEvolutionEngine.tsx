@@ -78,7 +78,7 @@ export const ProblemEvolutionEngine: React.FC<ProblemEvolutionEngineProps> = ({
     topic.step4Exercises[0]?.solutionLatex || ''
   );
   const [selectedStrategy, setSelectedStrategy] = useState<string>('generalization');
-  const [targetTier, setTargetTier] = useState<string>('national_vmo');
+  const [targetTier, setTargetTier] = useState<string>('thpt_qg_vdc');
   const [generatedVariants, setGeneratedVariants] = useState<EvolutionVariant[]>(
     topic.step5Evolutions[0]?.variants || []
   );
@@ -292,6 +292,7 @@ export const ProblemEvolutionEngine: React.FC<ProblemEvolutionEngineProps> = ({
                 className="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 focus:ring-2 focus:ring-purple-500 focus:outline-none"
               >
                 <option value="provincial_hsg">HSG Cấp Tỉnh / Thành Phố (Tầng 2)</option>
+                <option value="thpt_qg_vdc">Ôn thi THPT Quốc Gia VD-VDC (Câu 45-50)</option>
                 <option value="national_vmo">Học Sinh Giỏi Quốc Gia - VMO (Tầng 3)</option>
                 <option value="tst_olympiad">Tuyển Chọn Đội Tuyển Quốc Tế - TST/IMO</option>
               </select>

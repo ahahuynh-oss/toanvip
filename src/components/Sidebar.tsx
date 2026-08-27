@@ -211,10 +211,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </span>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-800/50 font-medium truncate max-w-[100px]">
                     {currentTopic.targetLevel === 'national_vmo'
-                      ? 'VMO QG'
-                      : currentTopic.targetLevel === 'provincial_hsg'
-                      ? 'HSG Tỉnh'
-                      : 'Tuyển Chọn'}
+                      ? 'VMO / Olympic'
+                      : currentTopic.targetLevel === 'thpt_qg_vdc'
+                      ? 'THPT Quốc Gia VDC'
+                      : 'HSG Tỉnh / Trường'}
                   </span>
                 </div>
                 <div className="flex items-center space-x-1">

@@ -129,6 +129,8 @@ export const StepWorkflowView: React.FC<StepWorkflowViewProps> = ({
                   ? 'HSG Cấp Tỉnh/Thành'
                   : topic.targetLevel === 'national_vmo'
                   ? 'HSG Quốc Gia (VMO)'
+                  : topic.targetLevel === 'thpt_qg_vdc'
+                  ? 'THPT Quốc Gia VDC'
                   : topic.targetLevel === 'school_team'
                   ? 'HSG Cấp Trường'
                   : 'Đội Tuyển Olympic'}

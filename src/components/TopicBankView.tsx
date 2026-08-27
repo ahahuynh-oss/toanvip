@@ -75,6 +75,8 @@ export const TopicBankView: React.FC<TopicBankViewProps> = ({
     switch (l) {
       case 'provincial_hsg':
         return { label: 'HSG Cấp Tỉnh', color: 'bg-blue-100 text-blue-800' };
+      case 'thpt_qg_vdc':
+        return { label: 'THPT Quốc Gia VDC', color: 'bg-rose-100 text-rose-800' };
       case 'national_vmo':
         return { label: 'HSG Quốc Gia (VMO)', color: 'bg-purple-100 text-purple-800' };
       case 'tst_olympiad':

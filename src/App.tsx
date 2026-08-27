@@ -296,7 +296,12 @@ export function App() {
   };
 
   // Create new topic manually and optionally auto-design with AI
-  const handleCreateTopic = async (newTopic: TopicCurriculum, triggerAi: boolean) => {
+  const handleCreateTopic = async (
+    newTopic: TopicCurriculum,
+    triggerAi: boolean,
+    imageBase64?: string,
+    mimeType?: string
+  ) => {
     let finalTopic = newTopic;
     setTopics((prev) => [finalTopic, ...prev]);
     setCurrentTopicId(finalTopic.id);
@@ -306,12 +311,19 @@ export function App() {
     if (triggerAi) {
       try {
         setIsAiProcessing(true);
-        const generated = await generateFullCurriculumAI(
-          newTopic.title,
-          newTopic.grade,
-          newTopic.mathBranch,
-          newTopic.targetLevel
-        );
+        let generated: Partial<TopicCurriculum>;
+        
+        if (imageBase64 && mimeType) {
+          // New Feature: Reverse engineer topic from image!
+          generated = await generateCurriculumFromImageAI(imageBase64, mimeType);
+        } else {
+          generated = await generateFullCurriculumAI(
+            newTopic.title,
+            newTopic.grade,
+            newTopic.mathBranch,
+            newTopic.targetLevel
+          );
+        }
 
         finalTopic = {
           ...newTopic,

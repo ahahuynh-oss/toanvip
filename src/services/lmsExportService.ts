@@ -13,7 +13,7 @@ export function exportToMoodleXml(topic: TopicCurriculum, quizQuestions?: QuizQu
     : topic.step4Exercises.map((ex, idx) => ({
         id: ex.id,
         topicId: topic.id,
-        title: `Bài ${idx + 1}: ${ex.title}`,
+        title: ex.title.match(/^Bài\s+\d+:/i) ? ex.title : `Bài ${idx + 1}: ${ex.title}`,
         contentLatex: ex.statementLatex,
         tier: ex.tier,
         type: 'multiple_choice' as const,
@@ -65,7 +65,7 @@ export function exportToGiftFormat(topic: TopicCurriculum, quizQuestions?: QuizQ
     : topic.step4Exercises.map((ex, idx) => ({
         id: ex.id,
         topicId: topic.id,
-        title: `Bài ${idx + 1}: ${ex.title}`,
+        title: ex.title.match(/^Bài\s+\d+:/i) ? ex.title : `Bài ${idx + 1}: ${ex.title}`,
         contentLatex: ex.statementLatex,
         tier: ex.tier,
         type: 'multiple_choice' as const,

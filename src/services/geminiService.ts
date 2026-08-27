@@ -138,8 +138,9 @@ export async function generateFullCurriculumAI(
   level: TargetLevel,
   notes?: string
 ): Promise<Partial<TopicCurriculum>> {
-  const prompt = `Bạn là một chuyên gia bồi dưỡng Học sinh Giỏi Toán THPT (VMO, Olympic Toán học) kiêm giảng viên phương pháp dạy học Toán.
-Hãy thiết kế TRỌN BỘ 5 BƯỚC SƯ PHẠM cho chuyên đề bồi dưỡng HSG Toán:
+  const isThptVdc = level === 'thpt_qg_vdc';
+  const prompt = `Bạn là một chuyên gia bồi dưỡng Học sinh Giỏi Toán THPT kiêm giảng viên phương pháp dạy học Toán.
+Hãy thiết kế TRỌN BỘ 5 BƯỚC SƯ PHẠM cho chuyên đề bồi dưỡng ${isThptVdc ? 'Ôn thi THPT Quốc Gia (Câu 40-50)' : 'HSG Toán'}:
 
 - Tên chuyên đề: "${title}"
 - Khối lớp: Lớp ${grade}
@@ -249,11 +250,11 @@ YÊU CẦU ĐỊNH DẠNG:
     {
       "id": "ex-3",
       "tier": "tier_3",
-      "title": "Bài 3: Vận dụng cao HSG Quốc Gia (VMO)",
-      "statementLatex": "Đề bài LaTeX",
+      "title": "Bài 3: ${isThptVdc ? 'Vận dụng cao THPT Quốc Gia' : 'Vận dụng cao HSG Quốc Gia (VMO)'}",
+      "statementLatex": "Đề bài LaTeX. ${isThptVdc ? 'Tạo ra 4 đáp án trắc nghiệm A, B, C, D ở cuối đề bài.' : ''}",
       "pedagogicalIdea": "Định hướng tiếp cận sư phạm",
       "hints": ["Gợi ý 1", "Gợi ý 2"],
-      "solutionLatex": "Lời giải chi tiết từng bước bằng LaTeX",
+      "solutionLatex": "Lời giải chi tiết từng bước bằng LaTeX. ${isThptVdc ? 'Nêu rõ đáp án đúng (A, B, C, D) ở cuối lời giải.' : ''}",
       "equalityCaseLatex": "Dấu bằng xảy ra",
       "generalizationNotes": "Mở rộng bài toán",
       "source": "Chọn Đội tuyển VMO"
@@ -261,7 +262,10 @@ YÊU CẦU ĐỊNH DẠNG:
   ]
 }
 
-LƯU Ý: Viết công thức LaTeX chuẩn xác (dùng ký hiệu $ ... $ hoặc $$ ... $$, escape dấu gạch chéo \\\\ nếu trong JSON). Lập luận phải toán học 100% chặt chẽ, không bỏ bước.`;
+LƯU Ý ĐẶC BIỆT:
+- Viết công thức LaTeX chuẩn xác (dùng ký hiệu $ ... $ hoặc $$ ... $$, escape dấu gạch chéo \\\\ nếu trong JSON).
+- KHÔNG dùng dấu \\\\ để xuống dòng ngoài môi trường toán học.
+- NẾU MỤC TIÊU LÀ THPT Quốc Gia (Vận Dụng Cao), thì KHÔNG ĐƯỢC sinh ra các bài toán quá sức như VMO/IMO. Tầng 3 (tier_3) chỉ là Câu 45-50 THPT. Các bài toán Tầng 3 phải kèm theo 4 đáp án A, B, C, D trong đề bài.`;
 
   const responseText = await callGemini(
     prompt,
@@ -271,6 +275,130 @@ LƯU Ý: Viết công thức LaTeX chuẩn xác (dùng ký hiệu $ ... $ hoặc
   );
 
   return parseJsonResponse<Partial<TopicCurriculum>>(responseText);
+}
+
+// Generate Curriculum from Image
+export async function generateCurriculumFromImageAI(
+  imageBase64: string,
+  mimeType: string,
+  notes?: string
+): Promise<Partial<TopicCurriculum>> {
+  const prompt = `Bạn là một chuyên gia toán học và giảng viên phương pháp dạy học.
+Tôi có chụp một bài toán khó (ví dụ từ đề thi THPT Quốc Gia hoặc HSG).
+Nhiệm vụ của bạn:
+1. Đọc bài toán trong ảnh, dịch lại nguyên văn đề bài bằng LaTeX.
+2. Xây dựng một TRỌN BỘ 5 BƯỚC SƯ PHẠM xung quanh bài toán gốc đó.
+Lấy bài toán trong ảnh làm bài mục tiêu (Bài 3 - Tầng 3). Các bài tập Tầng 1 và Tầng 2 phải là các bài tập bổ trợ, dẫn dắt học sinh đến được cách giải của bài toán trong ảnh.
+
+YÊU CẦU ĐỊNH DẠNG:
+- TẤT CẢ các công thức toán học, biến số, biểu thức (ví dụ: $x$, $\sqrt{3x+1}$, $x \ge 0$) BẮT BUỘC phải được bọc trong dấu $ (inline) hoặc $$ (display).
+- KHÔNG dùng dấu \\\\ để xuống dòng trong văn bản thường.
+- Sinh ra 4 đáp án trắc nghiệm A, B, C, D cho các bài toán nếu phù hợp.
+- Trả về DUY NHẤT một chuỗi JSON hợp lệ theo đúng cấu trúc schema sau:
+
+{
+  "step1Pedagogy": {
+    "cognitiveLevels": {
+      "knowledge": ["3 mục tiêu nhận biết"],
+      "understanding": ["3 mục tiêu thông hiểu"],
+      "application": ["3 mục tiêu vận dụng"],
+      "highApplication": ["3 mục tiêu vận dụng cao"],
+      "creativeOlympiad": ["2 mục tiêu sáng tạo Olympic"]
+    },
+    "keyCompetencies": ["3-5 năng lực toán học chuyên sâu"],
+    "estimatedHours": 6,
+    "prerequisites": ["3 kiến thức nền tảng"]
+  },
+  "step2Roadmap": [
+    {
+      "id": "r1",
+      "title": "Tên chặng 1",
+      "type": "prerequisite",
+      "description": "Mô tả ngắn",
+      "latexSummary": "Công thức LaTeX",
+      "order": 1
+    }
+  ],
+  "step3Theory": {
+    "overviewMarkdown": "Nội dung lý thuyết chuyên sâu, giải thích bản chất tư duy toán học",
+    "coreTheoremsLatex": "Phát biểu định lý chuẩn LaTeX",
+    "keyLemmas": [
+      {
+        "id": "lem-1",
+        "name": "Tên bổ đề 1",
+        "statementLatex": "Phát biểu bổ đề",
+        "proofLatex": "Chứng minh chi tiết bằng LaTeX",
+        "pedagogyNotes": "Ý nghĩa sư phạm và dấu hiệu nhận biết",
+        "commonTraps": ["2 sai lầm học sinh thường mắc"]
+      }
+    ]
+  },
+  "step4Exercises": [
+    {
+      "id": "ex-1",
+      "tier": "tier_1",
+      "title": "Bài 1: Nền tảng (Bổ trợ cho câu trong ảnh)",
+      "statementLatex": "Đề bài LaTeX. Có 4 đáp án A, B, C, D.",
+      "pedagogicalIdea": "Định hướng tiếp cận sư phạm",
+      "hints": ["Gợi ý 1", "Gợi ý 2"],
+      "solutionLatex": "Lời giải chi tiết. Chỉ rõ đáp án.",
+      "equalityCaseLatex": "",
+      "generalizationNotes": "",
+      "source": "Tự biên soạn"
+    },
+    {
+      "id": "ex-2",
+      "tier": "tier_2",
+      "title": "Bài 2: Vận dụng (Tương tự nhưng dễ hơn chút)",
+      "statementLatex": "Đề bài LaTeX. Có 4 đáp án A, B, C, D.",
+      "pedagogicalIdea": "Định hướng tiếp cận sư phạm",
+      "hints": ["Gợi ý 1", "Gợi ý 2"],
+      "solutionLatex": "Lời giải chi tiết. Chỉ rõ đáp án.",
+      "equalityCaseLatex": "",
+      "generalizationNotes": "",
+      "source": "Tự biên soạn"
+    },
+    {
+      "id": "ex-3",
+      "tier": "tier_3",
+      "title": "Bài 3: Câu hỏi gốc trong ảnh",
+      "statementLatex": "Nguyên văn đề bài trong ảnh. Có 4 đáp án A, B, C, D.",
+      "pedagogicalIdea": "Định hướng tiếp cận sư phạm",
+      "hints": ["Gợi ý 1", "Gợi ý 2"],
+      "solutionLatex": "Lời giải chi tiết. Chỉ rõ đáp án.",
+      "equalityCaseLatex": "",
+      "generalizationNotes": "",
+      "source": "Trích từ ảnh"
+    }
+  ],
+  "step5Evolutions": []
+}
+
+Ghi chú bổ sung: ${notes || 'Không có'}
+`;
+
+  const attachment = {
+    name: 'problem_image',
+    type: 'image',
+    mimeType: mimeType,
+    size: 0,
+    data: imageBase64,
+  };
+
+  const responseText = await callGemini(
+    prompt,
+    'Bạn là chuyên gia giáo dục Toán THPT.',
+    'gemini-3.6-pro',
+    0.7,
+    undefined,
+    [attachment]
+  );
+  try {
+    const cleaned = responseText.replace(/```json/g, '').replace(/```/g, '');
+    return JSON.parse(cleaned) as Partial<TopicCurriculum>;
+  } catch (err) {
+    throw new Error('Lỗi khi phân tích JSON trả về từ AI Tutor: ' + err);
+  }
 }
 
 // 2. Deep Problem Evolution Engine
