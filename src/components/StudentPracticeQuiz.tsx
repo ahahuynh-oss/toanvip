@@ -310,7 +310,7 @@ export const StudentPracticeQuiz: React.FC<StudentPracticeQuizProps> = ({
                       {String.fromCharCode(65 + oi)}
                     </div>
                     <div className="flex-1 text-xs">
-                      <MathRenderer content={opt.latex} />
+                      <MathRenderer content={`$${opt.latex}$`} />
                     </div>
                     {isSubmitted && isCorrect && (
                       <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />

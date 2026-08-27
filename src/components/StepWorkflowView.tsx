@@ -544,7 +544,7 @@ export const StepWorkflowView: React.FC<StepWorkflowViewProps> = ({
                           <p className="text-xs opacity-90">{node.description}</p>
                           {node.latexSummary && (
                             <div className="bg-white/90 p-2.5 rounded-lg border border-slate-200/80 mt-2">
-                              <MathRenderer content={node.latexSummary} />
+                              <MathRenderer content={`$$${node.latexSummary}$$`} />
                             </div>
                           )}
                         </div>
@@ -818,7 +818,7 @@ export const StepWorkflowView: React.FC<StepWorkflowViewProps> = ({
                         {ex.equalityCaseLatex && (
                           <div className="mt-3 pt-3 border-t border-emerald-100 text-xs font-semibold text-emerald-800">
                             <span>Dấu đẳng thức xảy ra khi: </span>
-                            <MathRenderer content={ex.equalityCaseLatex} className="inline font-mono" />
+                            <MathRenderer content={`$${ex.equalityCaseLatex}$`} className="inline font-mono" />
                           </div>
                         )}
                       </div>

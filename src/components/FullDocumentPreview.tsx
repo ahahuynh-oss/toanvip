@@ -115,7 +115,7 @@ export const FullDocumentPreview: React.FC<FullDocumentPreviewProps> = ({
                 <p className="text-slate-600 mt-0.5">{r.description}</p>
                 {r.latexSummary && (
                   <div className="mt-1">
-                    <MathRenderer content={r.latexSummary} />
+                    <MathRenderer content={`$$${r.latexSummary}$$`} />
                   </div>
                 )}
               </div>
@@ -188,7 +188,7 @@ export const FullDocumentPreview: React.FC<FullDocumentPreviewProps> = ({
                 {ex.equalityCaseLatex && (
                   <div className="text-xs text-emerald-900 font-semibold pt-1">
                     <span>Dấu đẳng thức: </span>
-                    <MathRenderer content={ex.equalityCaseLatex} className="inline" />
+                    <MathRenderer content={`$${ex.equalityCaseLatex}$`} className="inline" />
                   </div>
                 )}
               </div>

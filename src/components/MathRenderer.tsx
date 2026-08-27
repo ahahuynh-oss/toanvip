@@ -50,8 +50,8 @@ function escapeHtml(text: string): string {
 function renderMixedMathAndMarkdown(rawText: string): string {
   if (!rawText) return '';
 
-  // 1. Process math blocks $$ ... $$ and \[ ... \]
-  let processed = rawText;
+  // Clean up any accidentally duplicated $$ wrappers
+  let processed = rawText.replace(/\$\$\$\$/g, '$$').replace(/\$\$\$/g, '$$');
 
   // Replace $$ ... $$
   processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
