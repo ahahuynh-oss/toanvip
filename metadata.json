@@ -1,0 +1,6 @@
+{
+  "name": "MathOlympiad Studio - Biên Soạn Chuyên Đề HSG Toán THPT",
+  "description": "Nền tảng AI hỗ trợ giáo viên Toán THPT thiết kế chuyên đề bồi dưỡng HSG chuẩn 5 bước sư phạm, phát triển biến thể bài toán chuyên sâu, kiểm tra logic toán học, biên soạn lời giải LaTeX và xuất bản đa định dạng.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
