@@ -108,7 +108,7 @@ Yêu cầu:
       const polished = await callGemini(
         prompt,
         'Bạn là biên tập viên Toán học THPT chuyên nghiệp.',
-        'gemini-3.7-flash',
+        'gemini-3.6-flash',
         0.5
       );
       setEditorContent(polished);
@@ -134,7 +134,7 @@ Hãy viết tiếp phần lập luận toán học chi tiết, chứng minh ch�
       const continuation = await callGemini(
         prompt,
         'Bạn là giáo viên bồi dưỡng HSG Toán.',
-        'gemini-3.7-flash',
+        'gemini-3.6-flash',
         0.7
       );
       setEditorContent((prev) => prev + '\n\n' + continuation);

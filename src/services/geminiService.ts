@@ -13,20 +13,20 @@ import {
 
 export const AI_MODELS = [
   {
-    id: 'gemini-3-flash-preview',
-    name: 'Gemini 3 Flash (Khuyến nghị - Nhanh & Tối ưu)',
+    id: 'gemini-3.6-flash',
+    name: 'Gemini 3.6 Flash (Khuyến nghị - Nhanh & Tối ưu)',
     tag: 'Default',
     desc: 'Tốc độ phản hồi cực nhanh, tối ưu cho biên soạn sư phạm & xử lý tài liệu lớn',
   },
   {
-    id: 'gemini-3-pro-preview',
-    name: 'Gemini 3 Pro (Suy luận Toán học Chuyên sâu)',
+    id: 'gemini-3.6-pro',
+    name: 'Gemini 3.6 Pro (Suy luận Toán học Chuyên sâu)',
     tag: 'High Reasoning',
     desc: 'Khả năng lập luận logic phức tạp, giải quyết bài toán cấp độ VMO / Olympic',
   },
   {
-    id: 'gemini-2.5-flash',
-    name: 'Gemini 2.5 Flash (Dự phòng ổn định)',
+    id: 'gemini-1.5-flash',
+    name: 'Gemini 1.5 Flash (Dự phòng ổn định)',
     tag: 'Stable Fallback',
     desc: 'Phiên bản ổn định cao, dự phòng khi các model khác quá tải quota',
   },
@@ -45,7 +45,7 @@ export interface FileAttachment {
 export async function callGemini(
   prompt: string,
   systemInstruction?: string,
-  selectedModel = 'gemini-3-flash-preview',
+  selectedModel = 'gemini-3.6-flash',
   temperature = 0.7,
   customApiKey?: string,
   attachments?: FileAttachment[]
@@ -58,13 +58,12 @@ export async function callGemini(
     );
   }
 
-  // Model fallback chain as instructed: selected -> gemini-3-flash-preview -> gemini-3-pro-preview -> gemini-2.5-flash
+  // Model fallback chain: selected -> gemini-3.6-flash -> gemini-3.6-pro -> gemini-1.5-flash
   const fallbackChain = [
     selectedModel,
-    'gemini-3-flash-preview',
-    'gemini-3-pro-preview',
-    'gemini-2.5-flash',
-    'gemini-3.7-flash',
+    'gemini-3.6-flash',
+    'gemini-3.6-pro',
+    'gemini-1.5-flash',
   ].filter((val, idx, arr) => arr.indexOf(val) === idx);
 
   let lastErrorMsg = '';
@@ -265,7 +264,7 @@ LƯU Ý: Viết công thức LaTeX chuẩn xác (dùng ký hiệu $ ... $ hoặc
   const responseText = await callGemini(
     prompt,
     'Bạn là chuyên gia Toán học và sư phạm THPT. Luôn trả về dữ liệu cấu trúc JSON chuẩn.',
-    'gemini-3.7-flash',
+    'gemini-3.6-flash',
     0.6
   );
 
@@ -310,7 +309,7 @@ Tạo ra 2 đến 3 BIẾN THỂ TƯ DUY SÂU, trả về định dạng JSON:
   const responseText = await callGemini(
     prompt,
     'Bạn là nhà toán học và chuyên gia sáng tác đề thi HSG Toán. Luôn trả về mảng JSON hợp lệ.',
-    'gemini-3.7-flash',
+    'gemini-3.6-flash',
     0.7
   );
 
@@ -410,7 +409,7 @@ TRẢ VỀ JSON THEO ĐỊNH DẠNG:
   const responseText = await callGemini(
     prompt,
     'Bạn là chuyên gia thẩm định toán học nghiêm ngặt nhất. Luôn trả về JSON.',
-    'gemini-3.7-flash',
+    'gemini-3.6-flash',
     0.4
   );
 
@@ -450,7 +449,7 @@ Hãy trả lời bằng giọng văn sư phạm truyền cảm hứng, ngắn g�
   return await callGemini(
     prompt,
     'Bạn là thầy giáo dạy toán truyền cảm hứng cho học sinh giỏi.',
-    'gemini-3.7-flash',
+    'gemini-3.6-flash',
     0.7
   );
 }
@@ -570,7 +569,7 @@ TRẢ VỀ KẾT QUẢ ĐỊNH DẠNG JSON:
     const responseText = await callGemini(
       prompt,
       'Bạn là Trợ lý HSG Toán THPT cao cấp, thông minh, chuẩn xác và chuẩn mực sư phạm. Luôn trả về JSON hợp lệ.',
-      'gemini-3.7-flash',
+      'gemini-3.6-flash',
       0.6,
       undefined,
       attachments
@@ -718,7 +717,7 @@ CẤU HÌNH MỤC TIÊU:
     const rawResponse = await callGemini(
       prompt,
       'Bạn là chuyên gia nghiên cứu đề thi và sư phạm Toán HSG. Luôn phân biệt dữ liệu thực tế với suy luận AI và trả về JSON hợp lệ.',
-      'gemini-3.7-flash',
+      'gemini-3.6-flash',
       0.65,
       undefined,
       attachments

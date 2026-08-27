@@ -48,7 +48,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       setTestStatus('idle');
 
       const directRes = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${formData.aiModel || 'gemini-3-flash-preview'}:generateContent?key=${formData.customApiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${formData.aiModel || 'gemini-3.6-flash'}:generateContent?key=${formData.customApiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -162,7 +162,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             
             <div className="grid grid-cols-1 gap-2.5">
               {AI_MODELS.map((m) => {
-                const isSelected = (formData.aiModel || 'gemini-3-flash-preview') === m.id;
+                const isSelected = (formData.aiModel || 'gemini-3.6-flash') === m.id;
                 return (
                   <div
                     key={m.id}

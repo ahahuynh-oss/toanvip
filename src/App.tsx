@@ -87,7 +87,7 @@ export function App() {
       } catch {}
     }
     return {
-      aiModel: 'gemini-3-flash-preview',
+      aiModel: 'gemini-3.6-flash',
       customApiKey: localStorage.getItem('gemini_api_key') || '',
       latexEngine: 'katex',
       teacherName: 'Huỳnh Thị Hà',
