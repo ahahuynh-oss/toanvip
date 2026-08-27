@@ -17,12 +17,14 @@ import {
   Download,
   GraduationCap,
   Volume2,
+  Upload,
+  Camera
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { QuizQuestion, TopicCurriculum } from '../types/math';
 import { MathRenderer } from './MathRenderer';
 import { DEMO_QUIZ_QUESTIONS } from '../data/defaultTopics';
-import { getAITutorHintAI } from '../services/geminiService';
+import { getAITutorHintAI, gradeStudentWorkAI } from '../services/geminiService';
 import { downloadMoodleXml, downloadGiftFile } from '../services/lmsExportService';
 
 interface StudentPracticeQuizProps {
@@ -68,6 +70,11 @@ export const StudentPracticeQuiz: React.FC<StudentPracticeQuizProps> = ({
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(true);
   const [activeHintLevel, setActiveHintLevel] = useState<number>(0);
   const [aiTutorResponse, setAiTutorResponse] = useState<string | null>(null);
+
+  // States for AI Grading
+  const [aiGradingResponse, setAiGradingResponse] = useState<string | null>(null);
+  const [isGradingProcessing, setIsGradingProcessing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Gamification state
   const [currentStreak, setCurrentStreak] = useState<number>(0);
@@ -159,6 +166,37 @@ export const StudentPracticeQuiz: React.FC<StudentPracticeQuizProps> = ({
     } finally {
       setIsAiProcessing(false);
     }
+  };
+
+  // Handle Image Upload for AI Grading
+  const handleUploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Convert file to Base64
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const base64Data = event.target?.result?.toString().split(',')[1];
+      if (!base64Data) return;
+
+      try {
+        setIsGradingProcessing(true);
+        setAiGradingResponse(null);
+        const res = await gradeStudentWorkAI(
+          currentQ.contentLatex,
+          currentQ.solutionLatex || '',
+          base64Data,
+          file.type
+        );
+        setAiGradingResponse(res);
+      } catch (err: any) {
+        alert('Lỗi chấm điểm AI: ' + err.message);
+      } finally {
+        setIsGradingProcessing(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const scoreStats = calculateScore();
@@ -481,6 +519,56 @@ export const StudentPracticeQuiz: React.FC<StudentPracticeQuizProps> = ({
                   Gợi ý từ Thầy AI (Mức {activeHintLevel}):
                 </span>
                 <MathRenderer content={aiTutorResponse} className="text-xs" />
+              </div>
+            )}
+          </div>
+
+          {/* Box 4: Nộp Bài Tự Luận & AI Chấm Điểm */}
+          <div className="bg-gradient-to-br from-emerald-50/80 via-white to-white border border-emerald-200 rounded-3xl p-5 shadow-sm space-y-4">
+            <div className="flex items-center space-x-2 text-emerald-900">
+              <Camera className="w-4 h-4 text-emerald-600" />
+              <h4 className="text-xs font-bold uppercase tracking-wider">
+                Nộp Tự Luận & Trợ Lý AI Chấm Điểm
+              </h4>
+            </div>
+            <p className="text-[11px] text-slate-600 leading-relaxed">
+              Nếu bạn giải bài ra giấy, hãy chụp ảnh bài làm và tải lên đây. AI sẽ đọc chữ viết tay, đối chiếu đáp án và chấm điểm chi tiết.
+            </p>
+
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleUploadImage}
+            />
+
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isGradingProcessing}
+              className="w-full flex items-center justify-center space-x-2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+            >
+              {isGradingProcessing ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>AI đang đọc ảnh & chấm điểm...</span>
+                </>
+              ) : (
+                <>
+                  <Camera className="w-4 h-4" />
+                  <span>Chụp Ảnh / Tải Lên Bài Làm</span>
+                </>
+              )}
+            </button>
+
+            {/* Grading Response */}
+            {aiGradingResponse && !isGradingProcessing && (
+              <div className="p-4 bg-white border border-emerald-200 rounded-2xl space-y-2 animate-in fade-in zoom-in duration-300 shadow-xs">
+                <span className="text-[11px] font-bold text-emerald-900 block flex items-center">
+                  <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-500" />
+                  Báo Cáo Chấm Thi AI:
+                </span>
+                <MathRenderer content={aiGradingResponse} className="text-xs text-slate-700" />
               </div>
             )}
           </div>

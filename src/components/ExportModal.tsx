@@ -18,6 +18,13 @@ import { TopicCurriculum } from '../types/math';
 import { downloadWordDocument } from '../services/docxExportService';
 import { downloadPptxPresentation } from '../services/pptxExportService';
 import { downloadMoodleXml, downloadGiftFile } from '../services/lmsExportService';
+import { FullDocumentPreview } from './FullDocumentPreview';
+
+declare global {
+  interface Window {
+    html2pdf: any;
+  }
+}
 
 interface ExportModalProps {
   topic: TopicCurriculum;
@@ -177,8 +184,38 @@ ${ex.equalityCaseLatex ? `\\\\\\textbf{Đẳng thức xảy ra khi:} $${ex.equal
     link.click();
   };
 
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('hidden-pdf-content');
+    if (!element || !window.html2pdf) return;
+
+    // We temporarily make it visible but position off-screen so html2pdf can render it correctly
+    element.style.display = 'block';
+    
+    const opt = {
+      margin:       10,
+      filename:     `${topic.code}_${topic.title.replace(/\s+/g, '_')}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    try {
+      await window.html2pdf().set(opt).from(element).save();
+    } finally {
+      element.style.display = 'none';
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+      {/* Hidden PDF Content */}
+      <div 
+        id="hidden-pdf-content" 
+        style={{ display: 'none', width: '800px', backgroundColor: 'white', padding: '20px' }}
+      >
+        <FullDocumentPreview topic={topic} />
+      </div>
+
       <div className="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -312,13 +349,10 @@ ${ex.equalityCaseLatex ? `\\\\\\textbf{Đẳng thức xảy ra khi:} $${ex.equal
               </div>
             </div>
             <button
-              onClick={() => {
-                onClose();
-                setTimeout(() => window.print(), 300);
-              }}
+              onClick={handleDownloadPDF}
               className="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition-all shadow-xs cursor-pointer text-center"
             >
-              Hộp Thoại In / PDF
+              Tải xuống file PDF
             </button>
           </div>
 

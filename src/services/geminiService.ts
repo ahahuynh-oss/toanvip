@@ -454,6 +454,47 @@ Hãy trả lời bằng giọng văn sư phạm truyền cảm hứng, ngắn g�
   );
 }
 
+// ---------------------------------------------------------------------------
+// 8. AI Tự luận: Chấm điểm bài làm qua ảnh chụp
+// ---------------------------------------------------------------------------
+export async function gradeStudentWorkAI(
+  problemLatex: string,
+  solutionLatex: string,
+  imageBase64: string,
+  mimeType: string
+): Promise<string> {
+  const prompt = `Bạn là giám khảo chấm thi HSG Toán.
+Dưới đây là ĐỀ BÀI:
+${problemLatex}
+
+Dưới đây là ĐÁP ÁN CHUẨN:
+${solutionLatex}
+
+Học sinh đã nộp ảnh bài giải tự luận đính kèm. 
+Nhiệm vụ của bạn:
+1. Đọc ảnh bài giải của học sinh.
+2. Đối chiếu với đáp án chuẩn.
+3. Nhận xét chi tiết: bước nào đúng, bước nào sai logic, tính toán sai ở đâu.
+4. Chấm điểm trên thang điểm 10.
+Trả về nhận xét dưới dạng văn bản có sử dụng markdown và LaTeX.`;
+
+  const attachment = {
+    inlineData: {
+      data: imageBase64,
+      mimeType: mimeType,
+    },
+  };
+
+  return await callGemini(
+    prompt,
+    'Bạn là giám khảo chấm thi HSG Toán nghiêm khắc và công tâm.',
+    'gemini-3.6-pro', // Sử dụng bản pro để suy luận toán học và đọc ảnh tốt hơn
+    0.3,
+    undefined,
+    [attachment]
+  );
+}
+
 // 5. HSG Copilot Assistant for Teachers (Trợ lý HSG)
 export interface CopilotActionProposal {
   type: 'add_lemma' | 'add_exercise' | 'update_pedagogy' | 'add_roadmap_node' | 'none';
