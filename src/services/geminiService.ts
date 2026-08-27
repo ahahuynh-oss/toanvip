@@ -479,10 +479,11 @@ Nhiệm vụ của bạn:
 Trả về nhận xét dưới dạng văn bản có sử dụng markdown và LaTeX.`;
 
   const attachment = {
-    inlineData: {
-      data: imageBase64,
-      mimeType: mimeType,
-    },
+    name: 'student_work',
+    type: 'image',
+    mimeType: mimeType,
+    size: 0,
+    data: imageBase64,
   };
 
   return await callGemini(
