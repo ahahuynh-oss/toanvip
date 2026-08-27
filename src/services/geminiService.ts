@@ -98,7 +98,13 @@ export async function callGemini(
           body: JSON.stringify({
             contents: [{ parts }],
             systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }] } : undefined,
-            generationConfig: { temperature, maxOutputTokens: 8192 },
+            generationConfig: { 
+              temperature, 
+              maxOutputTokens: 8192,
+              ...((prompt.includes('JSON') || prompt.includes('json') || (systemInstruction && (systemInstruction.includes('JSON') || systemInstruction.includes('json')))) 
+                ? { responseMimeType: 'application/json' } 
+                : {})
+            },
           }),
         }
       );
@@ -1072,12 +1078,28 @@ function parseJsonResponse<T>(rawText: string): T {
     endIdx = lastBracket + 1;
   }
 
-  const jsonSubstring = cleaned.substring(startIdx, endIdx);
+  let jsonSubstring = cleaned.substring(startIdx, endIdx);
 
   try {
     return JSON.parse(jsonSubstring) as T;
   } catch (err) {
-    console.error('Failed to parse AI JSON:', jsonSubstring);
-    throw new Error('Định dạng phản hồi từ AI không đúng cấu trúc JSON mong đợi.');
+    console.warn('First JSON parse attempt failed, trying to sanitize...', err);
+    try {
+      // 1. Remove trailing commas before closing braces/brackets
+      let sanitized = jsonSubstring.replace(/,\s*([}\]])/g, '$1');
+      
+      // 2. Escape unescaped backslashes (often found in LaTeX like \frac instead of \\frac)
+      // We look for a backslash that is not followed by a valid JSON escape character (", \, /, b, f, n, r, t, u)
+      sanitized = sanitized.replace(/\\([^"\\/bfnrtu])/g, '\\\\$1');
+      
+      // 3. Fix literal newlines inside strings (which breaks JSON.parse)
+      // This is a naive replacement that replaces actual line breaks with \n
+      sanitized = sanitized.replace(/\n/g, '\\n').replace(/\r/g, '');
+      
+      return JSON.parse(sanitized) as T;
+    } catch (err2) {
+      console.error('Failed to parse AI JSON even after sanitization:', jsonSubstring);
+      throw new Error('Định dạng phản hồi từ AI không đúng cấu trúc JSON mong đợi.');
+    }
   }
 }
