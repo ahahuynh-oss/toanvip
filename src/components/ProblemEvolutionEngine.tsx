@@ -232,7 +232,7 @@ export const ProblemEvolutionEngine: React.FC<ProblemEvolutionEngineProps> = ({
                 <span className="text-[10px] font-bold text-purple-800 uppercase block mb-1">
                   Hiển thị công thức xem trước:
                 </span>
-                <MathRenderer content={`$$${originalProblem}$$`} />
+                <MathRenderer content={originalProblem} />
               </div>
             )}
 
@@ -376,7 +376,7 @@ export const ProblemEvolutionEngine: React.FC<ProblemEvolutionEngineProps> = ({
                     <span className="text-[11px] font-bold text-slate-700 uppercase block mb-1">
                       Đề bài biến thể mới:
                     </span>
-                    <MathRenderer content={`$$${variant.statementLatex}$$`} />
+                    <MathRenderer content={variant.statementLatex} />
                   </div>
 
                   {/* Pedagogical Rationale */}

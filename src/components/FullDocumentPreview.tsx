@@ -115,7 +115,7 @@ export const FullDocumentPreview: React.FC<FullDocumentPreviewProps> = ({
                 <p className="text-slate-600 mt-0.5">{r.description}</p>
                 {r.latexSummary && (
                   <div className="mt-1">
-                    <MathRenderer content={`$$${r.latexSummary}$$`} />
+                    <MathRenderer content={r.latexSummary} />
                   </div>
                 )}
               </div>
@@ -137,7 +137,7 @@ export const FullDocumentPreview: React.FC<FullDocumentPreviewProps> = ({
                   Bổ đề {li + 1}: {lem.name}
                 </h4>
                 <div className="bg-white p-3 rounded border border-slate-200">
-                  <MathRenderer content={`$$${lem.statementLatex}$$`} />
+                  <MathRenderer content={lem.statementLatex} />
                 </div>
                 <div className="text-slate-800">
                   <span className="font-semibold block mb-1">Chứng minh:</span>
@@ -172,7 +172,7 @@ export const FullDocumentPreview: React.FC<FullDocumentPreviewProps> = ({
 
                 <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
                   <span className="font-bold block mb-1">Đề bài:</span>
-                  <MathRenderer content={`$$${ex.statementLatex}$$`} />
+                  <MathRenderer content={ex.statementLatex} />
                 </div>
 
                 <div className="text-xs text-slate-700 bg-amber-50/50 p-2.5 rounded border border-amber-200">
@@ -188,7 +188,7 @@ export const FullDocumentPreview: React.FC<FullDocumentPreviewProps> = ({
                 {ex.equalityCaseLatex && (
                   <div className="text-xs text-emerald-900 font-semibold pt-1">
                     <span>Dấu đẳng thức: </span>
-                    <MathRenderer content={`$${ex.equalityCaseLatex}$`} className="inline" />
+                    <MathRenderer content={ex.equalityCaseLatex} className="inline" />
                   </div>
                 )}
               </div>
@@ -209,7 +209,7 @@ export const FullDocumentPreview: React.FC<FullDocumentPreviewProps> = ({
                     Biến thể {vi + 1}: {v.strategyName}
                   </span>
                   <div className="bg-white p-3 rounded border border-purple-200">
-                    <MathRenderer content={`$$${v.statementLatex}$$`} />
+                    <MathRenderer content={v.statementLatex} />
                   </div>
                   <MathRenderer content={v.solutionLatex} />
                 </div>

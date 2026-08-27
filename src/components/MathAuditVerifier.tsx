@@ -330,7 +330,7 @@ export const MathAuditVerifier: React.FC<MathAuditVerifierProps> = ({
                       <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
                         Đề bài đã chuẩn hóa:
                       </span>
-                      <MathRenderer content={`$$${currentReport.repairedProblemLatex}$$`} />
+                      <MathRenderer content={currentReport.repairedProblemLatex} />
                     </div>
                   )}
 

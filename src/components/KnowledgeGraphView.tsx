@@ -370,7 +370,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({ topic })
                   Công thức trọng tâm:
                 </span>
                 <div className="text-xs overflow-x-auto py-1">
-                  <MathRenderer content={`$$${selectedNode.latex}$$`} />
+                  <MathRenderer content={selectedNode.latex} />
                 </div>
               </div>
             )}

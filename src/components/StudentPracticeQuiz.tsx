@@ -233,7 +233,7 @@ export const StudentPracticeQuiz: React.FC<StudentPracticeQuizProps> = ({
               <span className="text-xs font-bold text-slate-700 block mb-2 uppercase tracking-wider">
                 Nội Dung Bài Toán:
               </span>
-              <MathRenderer content={`$$${currentQ.contentLatex}$$`} />
+              <MathRenderer content={currentQ.contentLatex} />
             </div>
 
             {/* Options List */}
@@ -272,7 +272,7 @@ export const StudentPracticeQuiz: React.FC<StudentPracticeQuizProps> = ({
                       {String.fromCharCode(65 + oi)}
                     </div>
                     <div className="flex-1 text-xs">
-                      <MathRenderer content={`$${opt.latex}$`} />
+                      <MathRenderer content={opt.latex} />
                     </div>
                     {isSubmitted && isCorrect && (
                       <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
