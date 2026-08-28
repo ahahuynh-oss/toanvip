@@ -234,11 +234,9 @@ export const CreateTopicModal: React.FC<CreateTopicModalProps> = ({
                 onChange={(e) => setTargetLevel(e.target.value as any)}
                 className="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               >
-                <option value="school_team">HSG Cấp Trường (Tầng 1)</option>
-                <option value="provincial_hsg">HSG Cấp Tỉnh/Thành (Tầng 2)</option>
+                <option value="provincial_hsg">HSG Cấp Tỉnh / Thành Phố (Trọng tâm)</option>
+                <option value="school_team">HSG Cấp Trường / Cụm Trường</option>
                 <option value="thpt_qg_vdc">Ôn thi THPT Quốc Gia VD-VDC (Câu 40-50)</option>
-                <option value="national_vmo">HSG Quốc Gia (VMO) (Tầng 3)</option>
-                <option value="tst_olympiad">Tuyển Chọn Olympic (TST)</option>
               </select>
             </div>
           </div>

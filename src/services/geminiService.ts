@@ -160,14 +160,24 @@ export async function generateFullCurriculumAI(
   notes?: string
 ): Promise<Partial<TopicCurriculum>> {
   const isThptVdc = level === 'thpt_qg_vdc';
-  const prompt = `Bạn là một chuyên gia bồi dưỡng Học sinh Giỏi Toán THPT kiêm giảng viên phương pháp dạy học Toán.
-Hãy thiết kế TRỌN BỘ 5 BƯỚC SƯ PHẠM cho chuyên đề bồi dưỡng ${isThptVdc ? 'Ôn thi THPT Quốc Gia (Câu 40-50)' : 'HSG Toán'}:
+  const levelText = level === 'school_team' ? 'HSG Cấp Trường / Cụm Trường' : level === 'provincial_hsg' ? 'HSG Cấp Tỉnh / Thành Phố' : 'Ôn thi THPT Quốc Gia VDC (Câu 40-50)';
+
+  const prompt = `Bạn là một chuyên gia hàng đầu về bồi dưỡng Học sinh Giỏi Toán THPT kiêm giảng viên phương pháp dạy học Toán (Chuyên sâu HSG Cấp Trường & HSG Cấp Tỉnh/Thành phố / Ôn thi THPT Quốc Gia VDC).
+Hãy thiết kế TRỌN BỘ 5 BƯỚC SƯ PHẠM bám sát chuẩn thi ${levelText}:
 
 - Tên chuyên đề: "${title}"
 - Khối lớp: Lớp ${grade}
 - Phân môn: ${branch}
-- Cấp độ bồi dưỡng: ${level} (Cấp Trường / HSG Tỉnh / HSG Quốc Gia VMO)
-- Ghi chú bổ sung của giáo viên: ${notes || 'Chuẩn bị cho kỳ thi HSG sắp tới'}
+- Cấp độ bồi dưỡng: ${levelText}
+- Ghi chú bổ sung của giáo viên: ${notes || 'Bồi dưỡng chuẩn bị cho kỳ thi HSG Cấp Trường / HSG Cấp Tỉnh sắp tới'}
+
+QUY TẮC PHẠM VI BẮT BUỘC (RẤT QUAN TRỌNG):
+- HỆ THỐNG ĐƯỢC THIẾT KẾ CHUYÊN BIỆT CHO HSG CẤP TRƯỜNG, HSG CẤP TỈNH VÀ ÔN THI THPT QUỐC GIA VDC.
+- TUYỆT ĐỐI KHÔNG sinh ra các bài toán cấp độ HSG Quốc gia (VMO) hay Olympic Quốc tế (IMO) quá khó, vượt khung chương trình THPT hoặc mang tính đánh đố không thực tế.
+- Hệ thống bài tập 3 tầng phải bám sát cấu trúc đề thi HSG Cấp Tỉnh / Cấp Trường:
+  + Tầng 1 (tier_1): Nền tảng chuyên sâu & Kỹ thuật bổ trợ then chốt.
+  + Tầng 2 (tier_2): Vận dụng chuẩn thi HSG Cấp Trường / Cụm trường.
+  + Tầng 3 (tier_3): Vận dụng cao chuẩn thi HSG Cấp Tỉnh / Thành Phố (hoặc Câu 45-50 THPT Quốc Gia nếu chọn mức THPT).
 
 YÊU CẦU ĐỊNH DẠNG:
 - TẤT CẢ các công thức toán học, biến số, biểu thức (ví dụ: $x$, $\sqrt{3x+1}$, $x \ge 0$) BẮT BUỘC phải được bọc trong dấu $ (inline) hoặc $$ (display). KHÔNG ĐƯỢC để công thức toán trần trụi giữa văn bản.
@@ -180,9 +190,9 @@ YÊU CẦU ĐỊNH DẠNG:
     "cognitiveLevels": {
       "knowledge": ["3 mục tiêu nhận biết"],
       "understanding": ["3 mục tiêu thông hiểu"],
-      "application": ["3 mục tiêu vận dụng"],
-      "highApplication": ["3 mục tiêu vận dụng cao"],
-      "creativeOlympiad": ["2 mục tiêu sáng tạo Olympic"]
+      "application": ["3 mục tiêu vận dụng HSG Trường"],
+      "highApplication": ["3 mục tiêu vận dụng cao HSG Tỉnh"],
+      "creativeOlympiad": ["2 mục tiêu tư duy sâu điểm 9-10 HSG Tỉnh"]
     },
     "keyCompetencies": ["3-5 năng lực toán học chuyên sâu"],
     "estimatedHours": 6,
@@ -193,7 +203,7 @@ YÊU CẦU ĐỊNH DẠNG:
       "id": "r1",
       "title": "Tên chặng 1",
       "type": "prerequisite",
-      "description": "Mô tả ngắn",
+      "description": "Mô tả ngắn kiến thức nền tảng",
       "latexSummary": "Công thức LaTeX",
       "order": 1
     },
@@ -248,38 +258,38 @@ YÊU CẦU ĐỊNH DẠNG:
     {
       "id": "ex-1",
       "tier": "tier_1",
-      "title": "Bài 1: Nền tảng chuyên",
+      "title": "Bài 1: Nền tảng chuyên & Kỹ thuật cơ bản",
       "statementLatex": "Đề bài LaTeX",
       "pedagogicalIdea": "Định hướng tiếp cận sư phạm",
       "hints": ["Gợi ý 1", "Gợi ý 2"],
       "solutionLatex": "Lời giải chi tiết từng bước bằng LaTeX",
       "equalityCaseLatex": "Dấu bằng xảy ra",
       "generalizationNotes": "Mở rộng bài toán",
-      "source": "Đề thi HSG"
+      "source": "Đề thi HSG Cấp Trường"
     },
     {
       "id": "ex-2",
       "tier": "tier_2",
-      "title": "Bài 2: Vận dụng HSG Tỉnh",
+      "title": "Bài 2: Vận dụng HSG Cấp Trường",
       "statementLatex": "Đề bài LaTeX",
       "pedagogicalIdea": "Định hướng tiếp cận sư phạm",
       "hints": ["Gợi ý 1", "Gợi ý 2"],
       "solutionLatex": "Lời giải chi tiết từng bước bằng LaTeX",
       "equalityCaseLatex": "Dấu bằng xảy ra",
       "generalizationNotes": "Mở rộng bài toán",
-      "source": "Đề thi HSG Tỉnh"
+      "source": "Đề thi HSG Cấp Trường / Cụm Trường"
     },
     {
       "id": "ex-3",
       "tier": "tier_3",
-      "title": "Bài 3: ${isThptVdc ? 'Vận dụng cao THPT Quốc Gia' : 'Vận dụng cao HSG Quốc Gia (VMO)'}",
+      "title": "Bài 3: ${isThptVdc ? 'Vận dụng cao THPT Quốc Gia (Câu 45-50)' : 'Vận dụng cao HSG Cấp Tỉnh / Thành Phố'}",
       "statementLatex": "Đề bài LaTeX. ${isThptVdc ? 'Tạo ra 4 đáp án trắc nghiệm A, B, C, D ở cuối đề bài.' : ''}",
       "pedagogicalIdea": "Định hướng tiếp cận sư phạm",
       "hints": ["Gợi ý 1", "Gợi ý 2"],
       "solutionLatex": "Lời giải chi tiết từng bước bằng LaTeX. ${isThptVdc ? 'Nêu rõ đáp án đúng (A, B, C, D) ở cuối lời giải.' : ''}",
       "equalityCaseLatex": "Dấu bằng xảy ra",
       "generalizationNotes": "Mở rộng bài toán",
-      "source": "Chọn Đội tuyển VMO"
+      "source": "${isThptVdc ? 'Đề thi THPT Quốc Gia' : 'Đề thi HSG Cấp Tỉnh / Thành Phố'}"
     }
   ]
 }
@@ -287,11 +297,11 @@ YÊU CẦU ĐỊNH DẠNG:
 LƯU Ý ĐẶC BIỆT:
 - Viết công thức LaTeX chuẩn xác (dùng ký hiệu $ ... $ hoặc $$ ... $$, escape dấu gạch chéo \\\\ nếu trong JSON).
 - KHÔNG dùng dấu \\\\ để xuống dòng ngoài môi trường toán học.
-- NẾU MỤC TIÊU LÀ THPT Quốc Gia (Vận Dụng Cao), thì KHÔNG ĐƯỢC sinh ra các bài toán quá sức như VMO/IMO. Tầng 3 (tier_3) chỉ là Câu 45-50 THPT. Các bài toán Tầng 3 phải kèm theo 4 đáp án A, B, C, D trong đề bài.`;
+- NẾU MỤC TIÊU LÀ THPT Quốc Gia (Vận Dụng Cao), thì Tầng 3 (tier_3) là Câu 45-50 THPT kèm 4 đáp án A, B, C, D trong đề bài.`;
 
   const responseText = await callGemini(
     prompt,
-    'Bạn là chuyên gia Toán học và sư phạm THPT. Luôn trả về dữ liệu cấu trúc JSON chuẩn.',
+    'Bạn là chuyên gia bồi dưỡng HSG Toán THPT (Cấp Trường & Cấp Tỉnh). Luôn trả về dữ liệu cấu trúc JSON chuẩn.',
     'gemini-2.5-flash',
     0.6
   );
@@ -426,7 +436,13 @@ export async function evolveMathProblemAI(
   targetTier: string,
   mathBranch: string
 ): Promise<EvolutionVariant[]> {
-  const prompt = `Bạn là chuyên gia nghiên cứu và sáng tác đề thi Olympic Toán (HSG Quốc gia VMO / IMO).
+  const targetLevelDesc = targetTier === 'thpt_qg_vdc' 
+    ? 'Ôn thi THPT Quốc Gia (Câu 45-50 Vận dụng cao)' 
+    : targetTier === 'school_team' 
+    ? 'HSG Cấp Trường / Cụm Trường (Tầng 2)' 
+    : 'HSG Cấp Tỉnh / Thành Phố (Tầng 3)';
+
+  const prompt = `Bạn là chuyên gia nghiên cứu và sáng tác đề thi Học sinh Giỏi Toán THPT (Chuyên sâu HSG Cấp Trường & HSG Cấp Tỉnh / Ôn thi THPT Quốc Gia VDC).
 Hãy PHÁT TRIỂN BÀI TOÁN GỐC sau thành các biến thể TƯ DUY SÂU (Tránh tuyệt đối việc thay số máy móc!):
 
 BÀI TOÁN GỐC:
@@ -435,7 +451,11 @@ ${originalProblem}
 ${originalSolution ? `LỜI GIẢI GỐC THAM KHẢO:\n${originalSolution}\n` : ''}
 - Phân môn: ${mathBranch}
 - Chiến lược phát triển ưu tiên: ${strategy} (Ví dụ: Tổng quát hóa n biến / Đối ngẫu - Đảo / Đổi cấu trúc Đại-Hình / Nới lỏng-Thắt chặt / Ghép bổ đề liên môn / Bất đối xứng)
-- Cấp độ mục tiêu: ${targetTier === 'thpt_qg_vdc' ? 'Ôn thi THPT Quốc Gia (Câu 45-50 Vận dụng cao)' : targetTier}
+- Cấp độ mục tiêu: ${targetLevelDesc}
+
+QUY TẮC PHẠM VI BẮT BUỘC:
+- Bám sát phạm vi đề thi HSG Cấp Trường và HSG Cấp Tỉnh. TUYỆT ĐỐI KHÔNG sáng tác bài toán quá khó ở mức VMO/IMO.
+- Tập trung vào tính tự nhiên của hướng giải, làm nổi bật bản chất toán học và khả năng áp dụng trong phòng thi HSG Tỉnh.
 
 YÊU CẦU:
 Tạo ra 2 đến 3 BIẾN THỂ TƯ DUY SÂU, trả về định dạng JSON:
@@ -451,19 +471,18 @@ Tạo ra 2 đến 3 BIẾN THỂ TƯ DUY SÂU, trả về định dạng JSON:
     "difficultyScore": 8,
     "equalityCondition": "Điều kiện xảy ra dấu đẳng thức hoặc nghiệm cực trị"
   }
-  }
 ]
 
 YÊU CẦU ĐỊNH DẠNG ĐẶC BIỆT:
 - BẮT BUỘC bọc toàn bộ biến số, công thức toán học bằng $ (inline) hoặc $$ (display).
-- Nếu Cấp độ mục tiêu là THPT Quốc Gia (VD-VDC), KHÔNG ĐƯỢC sinh ra bài toán quá khó cỡ VMO/IMO, chỉ dừng ở mức Câu 45-50 THPT. VÀ TẠO RA 4 ĐÁP ÁN TRẮC NGHIỆM A, B, C, D ở cuối đề bài.
+- Nếu Cấp độ mục tiêu là THPT Quốc Gia (VD-VDC), chỉ dừng ở mức Câu 45-50 THPT và tạo ra 4 đáp án A, B, C, D ở cuối đề bài.
 - KHÔNG DÙNG DẤU \\\\ để xuống dòng trong văn bản bình thường.
 - Tuyệt đối chỉ trả về mảng JSON, không giải thích gì thêm.`;
 
   const responseText = await callGemini(
     prompt,
-    'Bạn là nhà toán học và chuyên gia sáng tác đề thi HSG Toán. Luôn trả về mảng JSON hợp lệ.',
-    'gemini-3.6-flash',
+    'Bạn là nhà toán học và chuyên gia sáng tác đề thi HSG Toán THPT (Cấp Trường & Cấp Tỉnh). Luôn trả về mảng JSON hợp lệ.',
+    'gemini-2.5-flash',
     0.7
   );
 
@@ -475,7 +494,7 @@ export async function auditMathProblemAI(
   problemLatex: string,
   solutionLatex: string
 ): Promise<MathAuditReport> {
-  const prompt = `Bạn là Chủ tịch Hội đồng Thẩm định Chuyên môn Đề thi HSG Toán Quốc gia.
+  const prompt = `Bạn là Chủ tịch Hội đồng Thẩm định Chuyên môn Đề thi HSG Toán THPT (Cấp Trường & Cấp Tỉnh).
 Hãy rà soát và kiểm tra toàn diện tính chuẩn xác, logic, và tính khả thi sư phạm của bài toán và lời giải sau:
 
 ĐỀ BÀI:
@@ -715,7 +734,7 @@ ${attachments.map((a, i) => `- Tệp ${i + 1}: ${a.name} (Loại: ${a.type || a.
 (LƯU Ý: Hãy đọc kỹ hình ảnh đề bài, hình vẽ hình học, hoặc nội dung tệp đính kèm để giải đáp, trích xuất LaTeX, phân tích sư phạm hoặc phát triển bài toán tương ứng!)`
     : '';
 
-  const prompt = `Bạn là "Trợ lý HSG" (AI Copilot) - Cố vấn chuyên môn sư phạm cao cấp dành riêng cho Giáo viên dạy đội tuyển Học sinh Giỏi Toán THPT.
+  const prompt = `Bạn là "Trợ lý HSG" (AI Copilot) - Cố vấn chuyên môn sư phạm cao cấp dành riêng cho Giáo viên dạy đội tuyển Học sinh Giỏi Toán THPT (HSG Cấp Trường, HSG Cấp Tỉnh/Thành phố & Ôn thi THPT Quốc Gia VDC).
 
 THÔNG TIN CHUYÊN ĐỀ ĐANG MỞ:
 ${JSON.stringify(currentTopicDetail, null, 2)}
@@ -738,8 +757,8 @@ QUY TẮC PHẢN HỒI CỦA TRỢ LÝ HSG:
    - Nếu là tệp tài liệu / tex / pdf: Phân tích cấu trúc và tổng hợp vào chuyên đề.
 4. ĐỐI VỚI CÁC CÂU HỎI PHỔ BIẾN:
    - "Chuyên đề này còn thiếu gì?": Đánh giá toàn diện từ Mục tiêu Bloom, Thiếu hụt Bổ đề then chốt, Thiếu dạng bài tập Tầng nào (Tầng 1/2/3), hay thiếu kỹ thuật liên môn.
-   - "Bài số X có thể phát triển theo hướng nào?": Đề xuất 2-3 hướng phát triển tư duy sâu (Tổng quát hóa, Đảo/Đối ngẫu, Bất biến/Điểm rơi lệch, Đổi cấu trúc) dựa trên bài cụ thể.
-   - "Hãy đề xuất bài khó hơn nhưng vẫn dùng kiến thức này": Soạn một bài tập mới ở cấp độ VMO / TST kèm ý tưởng sư phạm và lời giải tóm tắt.
+   - "Bài số X có thể phát triển theo hướng nào?": Đề xuất 2-3 hướng phát triển tư duy sâu (Tổng quát hóa, Đảo/Đối ngẫu, Bất biến/Điểm rơi lệch, Đổi cấu trúc) bám sát đề thi HSG Tỉnh.
+   - "Hãy đề xuất bài khó hơn nhưng vẫn dùng kiến thức này": Soạn một bài tập mới ở cấp độ HSG Tỉnh (Tầng 3) kèm ý tưởng sư phạm và lời giải tóm tắt. TUYỆT ĐỐI KHÔNG đẩy lên bài toán VMO/IMO quá sức.
    - "Các chuyên đề của tôi có bị trùng không?": So sánh chuyên đề hiện tại với các chuyên đề khác trong danh sách, chỉ ra chỗ giao thoa kiến thức và cách tái cấu trúc.
    - "Hãy kiểm tra sự cân bằng của chương trình": Đánh giá tỷ lệ bài tập (Tầng 1 vs Tầng 2 vs Tầng 3), độ phủ các phân môn, thời lượng.
 5. NGUYÊN TẮC: "AI Copilot không trực tiếp thay đổi dữ liệu nếu chưa được giáo viên xác nhận".
@@ -801,16 +820,17 @@ export async function analyzeExamAndRecommendTopics(
   mathBranchFilter: MathBranch | 'all' = 'all',
   attachments?: FileAttachment[]
 ): Promise<ExamResearchAnalysisResult> {
-  const prompt = `BẠN LÀ CHUYÊN GIA SƯ PHẠM VÀ NGHIÊN CỨU CHƯƠNG TRÌNH HSG TOÁN QUỐC GIA.
+  const prompt = `BẠN LÀ CHUYÊN GIA SƯ PHẠM VÀ NGHIÊN CỨU CHƯƠNG TRÌNH HSG TOÁN THPT (CHUYÊN SÂU HSG CẤP TRƯỜNG & HSG CẤP TỈNH / THPT QUỐC GIA VDC).
 NHIỆM VỤ CỐT LÕI:
-Nghiên cứu các đề thi thực chiến do giáo viên cung cấp để đề xuất chương trình bồi dưỡng chuyên đề.
+Nghiên cứu các đề thi thực chiến do giáo viên cung cấp để đề xuất chương trình bồi dưỡng chuyên đề chuẩn thi HSG Cấp Trường / Cấp Tỉnh.
 
 QUY TẮC BẮT BUỘC VỀ TÍNH CHÍNH XÁC VÀ TRÁCH NHIỆM SƯ PHẠM:
 1. PHÂN BIỆT RÕ RÀNG 100%:
    - "DỮ LIỆU THỰC TẾ ĐỀ THI": Trích dẫn nguyên văn đề bài, câu hỏi, đối tượng toán học xuất hiện thực tế trong đề đã nộp.
    - "SUY LUẬN & ĐỀ XUẤT CỦA AI": Luận giải sư phạm, bổ đề ngầm giả định, kỹ thuật tư duy mà AI gợi ý cho giáo viên.
-2. TUYỆT ĐỐI KHÔNG "DỰ ĐOÁN ĐỀ THI TƯƠNG LAI" HOẶC XU HƯỚNG ĐOÁN ĐỀ / HỌC TỦ:
-   Mục đích là giúp giáo viên trả lời: "Dựa trên những bài toán thực tế này, những kiến thức, dạng toán và phương pháp nào đáng được đưa vào chương trình bồi dưỡng — và vì sao?" để rèn luyện năng lực toán học thực chất cho học sinh.
+2. PHẠM VI BỒI DƯỠNG:
+   - Tập trung 100% vào phạm vi kiến thức thi HSG Cấp Trường, HSG Cấp Tỉnh và Ôn thi THPT Quốc Gia VDC.
+   - TUYỆT ĐỐI KHÔNG sa đà vào các dạng toán Quốc Gia (VMO) hay Olympic Quốc Tế (IMO) vượt ngoài tầm đề thi Tỉnh.
 3. TÔN TRỌNG QUYỀN DUYỆT CHUYÊN MÔN CỦA GIÁO VIÊN:
    Cung cấp danh mục kỹ thuật và bổ đề rõ ràng để giáo viên có thể tích chọn, từ chối hoặc điều chỉnh.
 
@@ -831,7 +851,7 @@ CẤU HÌNH MỤC TIÊU:
   "factualSummary": {
     "totalProblemsExtracted": 3,
     "branchesCovered": ["Đại số", "Hình học", "Tổ hợp"],
-    "difficultyDistribution": "20% Nhận biết kỹ thuật, 50% Vận dụng HSG Tỉnh, 30% Phân loại VMO"
+    "difficultyDistribution": "30% Nhận biết kỹ thuật, 45% Vận dụng HSG Trường, 25% Vận dụng cao HSG Tỉnh"
   },
   "disclaimerNotice": "Dữ liệu đề thi là căn cứ thực tế của quá khứ. Mọi đề xuất là gợi ý sư phạm hỗ trợ giáo viên xây dựng năng lực tư duy, không mang tính chất dự đoán đề thi hay học tủ.",
   "patterns": [

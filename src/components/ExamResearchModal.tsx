@@ -63,9 +63,9 @@ Bài 3 (4.0 điểm): Tìm tất cả các cặp số nguyên $(x, y)$ thỏa m�
 $$x^3 + y^3 = (x+y)^2 + 2(xy - 1)$$`,
   },
   {
-    title: 'Đề Thi Chọn Đội Tuyển Olympic / VMO (Tổ Hợp & Số Học Chuyên Sâu)',
+    title: 'Đề Thi HSG Cấp Tỉnh / Thành Phố (Tổ Hợp & Số Học THPT)',
     grade: '11' as const,
-    targetLevel: 'national_vmo' as const,
+    targetLevel: 'provincial_hsg' as const,
     mathBranch: 'combinatorics' as const,
     content: `Bài 1 (5.0 điểm): Cho tập hợp $S = \\{1, 2, 3, \\dots, 2024\\}$. Hỏi có thể chia tập $S$ thành hai tập con rời nhau $A$ và $B$ sao cho trong mỗi tập không chứa 3 phần tử nào lập thành một cấp số cộng?
 
@@ -76,9 +76,9 @@ khi viết dưới dạng phân số tối giản thì chia hết cho $p^2$ (Đ�
 Bài 3 (5.0 điểm): Trên một bảng ô vuông kích thước $n \\times n$, mỗi ô được điền một số thực sao cho tổng các số trên mỗi hàng và mỗi cột đều bằng 1. Chứng minh tồn tại cấu hình...`,
   },
   {
-    title: 'Đề Thi Tuyển Chọn Olympic Hình Học Phẳng (Hàng Điểm Điều Hòa & Điểm Cố Định)',
+    title: 'Đề Thi HSG Cấp Tỉnh (Hình Học Phẳng - Tiếp Tuyến & Cực Trị Hình Học)',
     grade: '10' as const,
-    targetLevel: 'national_vmo' as const,
+    targetLevel: 'provincial_hsg' as const,
     mathBranch: 'geometry' as const,
     content: `Bài 1 (6.0 điểm): Cho tam giác nhọn $ABC$ có trực tâm $H$ và đường tròn ngoại tiếp $(O)$. Đường tròn nội tiếp $(I)$ tiếp xúc với $BC, CA, AB$ lần lượt tại $D, E, F$. Đường thẳng qua $D$ vuông góc với $EF$ cắt lại $(I)$ tại $K$. Tiếp tuyến của $(I)$ tại $K$ cắt $BC$ tại $T$.
 a) Chứng minh rằng $T, E, F$ thẳng hàng.
@@ -506,10 +506,9 @@ Bài 2: Cho a, b, c > 0 thỏa mãn ab+bc+ca = 3. Chứng minh rằng..."
                     onChange={(e) => setTargetLevel(e.target.value as any)}
                     className="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-xs"
                   >
-                    <option value="school_team">HSG Cấp Trường / Vòng Chọn</option>
-                    <option value="provincial_hsg">HSG Cấp Tỉnh / Thành Phố</option>
-                    <option value="national_vmo">HSG Quốc Gia (VMO)</option>
-                    <option value="tst_olympiad">Tuyển Chọn Đội Tuyển Olympic</option>
+                    <option value="provincial_hsg">HSG Cấp Tỉnh / Thành Phố (Trọng tâm)</option>
+                    <option value="school_team">HSG Cấp Trường / Cụm Trường</option>
+                    <option value="thpt_qg_vdc">Ôn Thi THPT Quốc Gia (VDC)</option>
                   </select>
                 </div>
 

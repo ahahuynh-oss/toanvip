@@ -4,9 +4,9 @@
 
 export type MathBranch = 'algebra' | 'geometry' | 'number_theory' | 'combinatorics' | 'calculus_sequences';
 
-export type TargetLevel = 'school_team' | 'provincial_hsg' | 'national_vmo' | 'tst_olympiad' | 'thpt_qg_vdc';
+export type TargetLevel = 'school_team' | 'provincial_hsg' | 'thpt_qg_vdc' | 'national_vmo' | 'tst_olympiad';
 
-export type ExerciseTier = 'tier_1' | 'tier_2' | 'tier_3'; // Tier 1: Foundation | Tier 2: Provincial | Tier 3: National/VMO
+export type ExerciseTier = 'tier_1' | 'tier_2' | 'tier_3'; // Tier 1: Nền tảng chuyên | Tier 2: Vận dụng HSG Trường | Tier 3: Vận dụng cao HSG Tỉnh / THPT VDC
 
 export interface PedagogicalTarget {
   cognitiveLevels: {

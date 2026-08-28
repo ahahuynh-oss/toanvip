@@ -247,10 +247,9 @@ export const TopicBankView: React.FC<TopicBankViewProps> = ({
             className="text-xs bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
           >
             <option value="all">Tất cả cấp độ</option>
-            <option value="school_team">HSG Cấp Trường</option>
-            <option value="provincial_hsg">HSG Cấp Tỉnh/Thành</option>
-            <option value="national_vmo">HSG Quốc Gia (VMO)</option>
-            <option value="tst_olympiad">Tuyển Chọn Olympic</option>
+            <option value="provincial_hsg">HSG Cấp Tỉnh / Thành Phố</option>
+            <option value="school_team">HSG Cấp Trường / Cụm Trường</option>
+            <option value="thpt_qg_vdc">THPT Quốc Gia VDC</option>
           </select>
         </div>
       </div>

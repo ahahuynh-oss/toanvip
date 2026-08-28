@@ -53,7 +53,7 @@ function renderMixedMathAndMarkdown(rawText: string): string {
   // Clean up any accidentally duplicated $$ wrappers
   let processed = rawText.replace(/\$\$\$\$/g, '$$').replace(/\$\$\$/g, '$$');
 
-  // Replace $$ ... $$
+  // Replace $$ ... $$ (display math)
   processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
     try {
       const rendered = katex.renderToString(math.trim(), {
@@ -66,7 +66,7 @@ function renderMixedMathAndMarkdown(rawText: string): string {
     }
   });
 
-  // Replace \[ ... \]
+  // Replace \[ ... \] (display math)
   processed = processed.replace(/\\\[([\s\S]*?)\\\]/g, (_, math) => {
     try {
       const rendered = katex.renderToString(math.trim(), {
@@ -92,7 +92,7 @@ function renderMixedMathAndMarkdown(rawText: string): string {
     }
   });
 
-  // Replace \( ... \)
+  // Replace \( ... \) (inline math)
   processed = processed.replace(/\\\(([\s\S]*?)\\\)/g, (_, math) => {
     try {
       return katex.renderToString(math.trim(), {
