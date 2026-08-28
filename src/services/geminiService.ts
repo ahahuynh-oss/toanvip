@@ -13,14 +13,14 @@ import {
 
 export const AI_MODELS = [
   {
-    id: 'gemini-3.6-flash',
-    name: 'Gemini 3.6 Flash (Khuyến nghị - Nhanh & Tối ưu)',
+    id: 'gemini-2.5-flash',
+    name: 'Gemini 2.5 Flash (Khuyến nghị - Nhanh & Chuẩn xác)',
     tag: 'Default',
-    desc: 'Tốc độ phản hồi cực nhanh, tối ưu cho biên soạn sư phạm & xử lý tài liệu lớn',
+    desc: 'Tốc độ phản hồi cực nhanh, tối ưu cho biên soạn sư phạm & cấu trúc LaTeX JSON',
   },
   {
-    id: 'gemini-3.6-pro',
-    name: 'Gemini 3.6 Pro (Suy luận Toán học Chuyên sâu)',
+    id: 'gemini-2.5-pro',
+    name: 'Gemini 2.5 Pro (Suy luận Toán học Chuyên sâu)',
     tag: 'High Reasoning',
     desc: 'Khả năng lập luận logic phức tạp, giải quyết bài toán cấp độ VMO / Olympic',
   },
@@ -29,6 +29,12 @@ export const AI_MODELS = [
     name: 'Gemini 1.5 Flash (Dự phòng ổn định)',
     tag: 'Stable Fallback',
     desc: 'Phiên bản ổn định cao, dự phòng khi các model khác quá tải quota',
+  },
+  {
+    id: 'gemini-3.6-flash',
+    name: 'Gemini 3.6 Flash',
+    tag: 'Alternative',
+    desc: 'Mô hình thay thế phụ trợ',
   },
 ];
 
@@ -45,11 +51,20 @@ export interface FileAttachment {
 export async function callGemini(
   prompt: string,
   systemInstruction?: string,
-  selectedModel = 'gemini-3.6-flash',
+  selectedModel?: string,
   temperature = 0.7,
   customApiKey?: string,
   attachments?: FileAttachment[]
 ): Promise<string> {
+  let settingsModel = '';
+  try {
+    const savedSettings = localStorage.getItem('math_app_settings');
+    if (savedSettings) {
+      const parsed = JSON.parse(savedSettings);
+      if (parsed.aiModel) settingsModel = parsed.aiModel;
+    }
+  } catch {}
+
   const apiKey = customApiKey || localStorage.getItem('gemini_api_key') || '';
 
   if (!apiKey) {
@@ -58,13 +73,19 @@ export async function callGemini(
     );
   }
 
-  // Model fallback chain: selected -> gemini-3.6-flash -> gemini-3.6-pro -> gemini-1.5-flash
+  const preferredModel = selectedModel || settingsModel || 'gemini-2.5-flash';
+
+  // Model fallback chain
   const fallbackChain = [
-    selectedModel,
+    preferredModel,
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+    'gemini-1.5-flash',
+    'gemini-2.5-pro',
+    'gemini-1.5-pro',
     'gemini-3.6-flash',
     'gemini-3.6-pro',
-    'gemini-1.5-flash',
-  ].filter((val, idx, arr) => arr.indexOf(val) === idx);
+  ].filter((val, idx, arr) => Boolean(val) && arr.indexOf(val) === idx);
 
   let lastErrorMsg = '';
 
@@ -150,8 +171,9 @@ Hãy thiết kế TRỌN BỘ 5 BƯỚC SƯ PHẠM cho chuyên đề bồi dư�
 
 YÊU CẦU ĐỊNH DẠNG:
 - TẤT CẢ các công thức toán học, biến số, biểu thức (ví dụ: $x$, $\sqrt{3x+1}$, $x \ge 0$) BẮT BUỘC phải được bọc trong dấu $ (inline) hoặc $$ (display). KHÔNG ĐƯỢC để công thức toán trần trụi giữa văn bản.
-- KHÔNG dùng dấu \\\\ để xuống dòng trong văn bản thường, hãy dùng ký tự xuống dòng (enter/newline) của Markdown. Dấu \\\\ chỉ được dùng bên trong môi trường toán học (như ma trận, hệ phương trình).
-- Trả về DUY NHẤT một chuỗi JSON hợp lệ (không kèm markdown \`\`\`json bao quanh nếu có thể, hoặc bọc trong \`\`\`json) theo đúng cấu trúc schema sau:
+- KHÔNG dùng dấu \\ để xuống dòng trong văn bản thường, hãy dùng ký tự xuống dòng (enter/newline) của Markdown. Dấu \\ chỉ được dùng bên trong môi trường toán học (như ma trận, hệ phương trình).
+- Mọi dấu gạch chéo ngược trong công thức toán LaTeX (như \frac, \sqrt, \alpha, \lim) BẮT BUỘC phải được escape chuẩn JSON (\\\\frac, \\\\sqrt, \\\\alpha, \\\\lim).
+- Trả về DUY NHẤT một chuỗi JSON hợp lệ theo đúng cấu trúc schema sau:
 
 {
   "step1Pedagogy": {
@@ -270,7 +292,7 @@ LƯU Ý ĐẶC BIỆT:
   const responseText = await callGemini(
     prompt,
     'Bạn là chuyên gia Toán học và sư phạm THPT. Luôn trả về dữ liệu cấu trúc JSON chuẩn.',
-    'gemini-3.6-flash',
+    'gemini-2.5-flash',
     0.6
   );
 
@@ -388,17 +410,12 @@ Ghi chú bổ sung: ${notes || 'Không có'}
   const responseText = await callGemini(
     prompt,
     'Bạn là chuyên gia giáo dục Toán THPT.',
-    'gemini-3.6-pro',
+    'gemini-2.5-pro',
     0.7,
     undefined,
     [attachment]
   );
-  try {
-    const cleaned = responseText.replace(/```json/g, '').replace(/```/g, '');
-    return JSON.parse(cleaned) as Partial<TopicCurriculum>;
-  } catch (err) {
-    throw new Error('Lỗi khi phân tích JSON trả về từ AI Tutor: ' + err);
-  }
+  return parseJsonResponse<Partial<TopicCurriculum>>(responseText);
 }
 
 // 2. Deep Problem Evolution Engine
@@ -418,7 +435,7 @@ ${originalProblem}
 ${originalSolution ? `LỜI GIẢI GỐC THAM KHẢO:\n${originalSolution}\n` : ''}
 - Phân môn: ${mathBranch}
 - Chiến lược phát triển ưu tiên: ${strategy} (Ví dụ: Tổng quát hóa n biến / Đối ngẫu - Đảo / Đổi cấu trúc Đại-Hình / Nới lỏng-Thắt chặt / Ghép bổ đề liên môn / Bất đối xứng)
-- Cấp độ mục tiêu: ${targetTier}
+- Cấp độ mục tiêu: ${targetTier === 'thpt_qg_vdc' ? 'Ôn thi THPT Quốc Gia (Câu 45-50 Vận dụng cao)' : targetTier}
 
 YÊU CẦU:
 Tạo ra 2 đến 3 BIẾN THỂ TƯ DUY SÂU, trả về định dạng JSON:
@@ -434,7 +451,14 @@ Tạo ra 2 đến 3 BIẾN THỂ TƯ DUY SÂU, trả về định dạng JSON:
     "difficultyScore": 8,
     "equalityCondition": "Điều kiện xảy ra dấu đẳng thức hoặc nghiệm cực trị"
   }
-]`;
+  }
+]
+
+YÊU CẦU ĐỊNH DẠNG ĐẶC BIỆT:
+- BẮT BUỘC bọc toàn bộ biến số, công thức toán học bằng $ (inline) hoặc $$ (display).
+- Nếu Cấp độ mục tiêu là THPT Quốc Gia (VD-VDC), KHÔNG ĐƯỢC sinh ra bài toán quá khó cỡ VMO/IMO, chỉ dừng ở mức Câu 45-50 THPT. VÀ TẠO RA 4 ĐÁP ÁN TRẮC NGHIỆM A, B, C, D ở cuối đề bài.
+- KHÔNG DÙNG DẤU \\\\ để xuống dòng trong văn bản bình thường.
+- Tuyệt đối chỉ trả về mảng JSON, không giải thích gì thêm.`;
 
   const responseText = await callGemini(
     prompt,
@@ -1221,56 +1245,220 @@ CẤU HÌNH MỤC TIÊU:
 }
 
 
+/**
+ * Sanitize raw string containing JSON with LaTeX formulas so it conforms to valid JSON syntax:
+ * 1. Correctly escapes unescaped LaTeX backslashes inside JSON string literals (e.g. \frac, \sqrt, \alpha, \underline, \beta, \times, \right, \neq, \lim).
+ * 2. Properly escapes literal newlines, carriage returns, and tabs inside JSON string literals while preserving whitespace outside strings.
+ * 3. Removes trailing commas before closing braces `}` and brackets `]`.
+ */
+function sanitizeJsonWithLatex(str: string): string {
+  let result = '';
+  let inString = false;
+  const len = str.length;
+
+  for (let i = 0; i < len; i++) {
+    const char = str[i];
+
+    if (!inString) {
+      if (char === '"') {
+        inString = true;
+        result += '"';
+      } else if (char === ',') {
+        // Look ahead to check if this is a trailing comma before } or ]
+        let j = i + 1;
+        while (j < len && /\s/.test(str[j])) {
+          j++;
+        }
+        if (j < len && (str[j] === '}' || str[j] === ']')) {
+          // Skip trailing comma
+          continue;
+        }
+        result += ',';
+      } else {
+        result += char;
+      }
+    } else {
+      // Inside JSON string literal
+      if (char === '\\') {
+        const nextChar = i + 1 < len ? str[i + 1] : '';
+
+        // 1. Escaped quotes or escaped backslashes or forward slashes
+        if (nextChar === '"' || nextChar === '\\' || nextChar === '/') {
+          result += '\\' + nextChar;
+          i++;
+          continue;
+        }
+
+        // 2. Unicode escape sequences: check if it's \uXXXX (4 hex digits)
+        if (nextChar === 'u') {
+          const hexPart = str.substring(i + 2, i + 6);
+          if (hexPart.length === 4 && /^[0-9a-fA-F]{4}$/.test(hexPart)) {
+            result += '\\u';
+            i++;
+            continue;
+          } else {
+            // Not a valid unicode escape (e.g. \underline, \bigcup, \underbrace, \upsilon) -> LaTeX command!
+            result += '\\\\u';
+            i++;
+            continue;
+          }
+        }
+
+        // 3. Control characters: \b, \f, \n, \r, \t
+        if (nextChar === 'b' || nextChar === 'f' || nextChar === 'n' || nextChar === 'r' || nextChar === 't') {
+          const afterNext = i + 2 < len ? str[i + 2] : '';
+          // If followed by a letter, it is a LaTeX command (e.g., \frac, \beta, \to, \times, \right, \neq, \begin, \text)
+          if (/[a-zA-Z]/.test(afterNext)) {
+            result += '\\\\' + nextChar;
+            i++;
+            continue;
+          }
+          // Otherwise, treat standard \n, \t, \r as JSON control escapes
+          if (nextChar === 'n' || nextChar === 't' || nextChar === 'r') {
+            result += '\\' + nextChar;
+            i++;
+            continue;
+          }
+          // Rare / isolated \b or \f: escape backslash to be safe
+          result += '\\\\' + nextChar;
+          i++;
+          continue;
+        }
+
+        // 4. Any other character after backslash (\lim, \sum, \sqrt, \alpha, \ge, \le, \infty, \(, \[, etc.)
+        result += '\\\\' + nextChar;
+        i++;
+      } else if (char === '"') {
+        inString = false;
+        result += '"';
+      } else if (char === '\n') {
+        // Literal newline inside string literal breaks JSON parser
+        result += '\\n';
+      } else if (char === '\r') {
+        // Skip or convert carriage return
+        if (i + 1 < len && str[i + 1] === '\n') {
+          continue;
+        }
+        result += '\\n';
+      } else if (char === '\t') {
+        result += '\\t';
+      } else {
+        result += char;
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Repairs incomplete/truncated JSON (e.g. if token limit was reached or closing brackets were cut off)
+ */
+function repairTruncatedJson(str: string): string {
+  let cleaned = str.trim();
+  const stack: string[] = [];
+  let inString = false;
+  let isEscaped = false;
+
+  for (let i = 0; i < cleaned.length; i++) {
+    const char = cleaned[i];
+
+    if (inString) {
+      if (isEscaped) {
+        isEscaped = false;
+      } else if (char === '\\') {
+        isEscaped = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+    } else {
+      if (char === '"') {
+        inString = true;
+      } else if (char === '{' || char === '[') {
+        stack.push(char);
+      } else if (char === '}') {
+        if (stack.length > 0 && stack[stack.length - 1] === '{') {
+          stack.pop();
+        }
+      } else if (char === ']') {
+        if (stack.length > 0 && stack[stack.length - 1] === '[') {
+          stack.pop();
+        }
+      }
+    }
+  }
+
+  let repaired = cleaned;
+
+  // If ended inside an unclosed string, close the string
+  if (inString) {
+    repaired += '"';
+  }
+
+  // Remove dangling commas or trailing colons
+  repaired = repaired.replace(/:\s*$/, ': ""').replace(/,\s*$/, '');
+
+  // Close remaining open brackets in reverse order
+  while (stack.length > 0) {
+    const open = stack.pop();
+    if (open === '{') repaired += '}';
+    else if (open === '[') repaired += ']';
+  }
+
+  return repaired;
+}
+
 // Helper to safely parse JSON from AI response
-function parseJsonResponse<T>(rawText: string): T {
+export function parseJsonResponse<T>(rawText: string): T {
+  if (!rawText || typeof rawText !== 'string') {
+    throw new Error('Không nhận được dữ liệu phản hồi từ AI.');
+  }
+
   let cleaned = rawText.trim();
   if (cleaned.startsWith('```json')) {
-    cleaned = cleaned.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    cleaned = cleaned.replace(/^```json\s*/i, '').replace(/\s*```$/i, '');
   } else if (cleaned.startsWith('```')) {
-    cleaned = cleaned.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    cleaned = cleaned.replace(/^```\s*/i, '').replace(/\s*```$/i, '');
   }
 
   // Find first { or [
   const firstBrace = cleaned.indexOf('{');
   const firstBracket = cleaned.indexOf('[');
   let startIdx = 0;
+  let isObject = true;
+
   if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
     startIdx = firstBrace;
+    isObject = true;
   } else if (firstBracket !== -1) {
     startIdx = firstBracket;
+    isObject = false;
   }
 
-  const lastBrace = cleaned.lastIndexOf('}');
-  const lastBracket = cleaned.lastIndexOf(']');
-  let endIdx = cleaned.length;
-  if (lastBrace !== -1 && (lastBracket === -1 || lastBrace > lastBracket)) {
-    endIdx = lastBrace + 1;
-  } else if (lastBracket !== -1) {
-    endIdx = lastBracket + 1;
-  }
+  const endChar = isObject ? '}' : ']';
+  const lastEndIdx = cleaned.lastIndexOf(endChar);
+  let endIdx = lastEndIdx !== -1 ? lastEndIdx + 1 : cleaned.length;
 
   let jsonSubstring = cleaned.substring(startIdx, endIdx);
 
+  // Attempt 1: Direct JSON.parse
   try {
     return JSON.parse(jsonSubstring) as T;
-  } catch (err) {
-    console.warn('First JSON parse attempt failed, trying to sanitize...', err);
+  } catch (err1) {
+    // Attempt 2: Sanitize LaTeX backslashes, newlines, trailing commas
     try {
-      // 1. Remove trailing commas before closing braces/brackets
-      let sanitized = jsonSubstring.replace(/,\s*([}\]])/g, '$1');
-      
-      // 2. Escape unescaped backslashes (often found in LaTeX like \frac instead of \\frac)
-      // We look for a backslash that is not followed by a valid JSON escape character (", \, /, b, f, n, r, t, u)
-      sanitized = sanitized.replace(/\\([^"\\/bfnrtu])/g, '\\\\$1');
-      
-      // 3. Fix literal newlines inside strings (which breaks JSON.parse)
-      // This is a naive replacement that replaces actual line breaks with \n
-      sanitized = sanitized.replace(/\n/g, '\\n').replace(/\r/g, '');
-      
+      const sanitized = sanitizeJsonWithLatex(jsonSubstring);
       return JSON.parse(sanitized) as T;
     } catch (err2) {
-      console.error('Failed to parse AI JSON even after sanitization:', jsonSubstring);
-      throw new Error('Định dạng phản hồi từ AI không đúng cấu trúc JSON mong đợi.');
+      // Attempt 3: Repair truncated JSON and sanitize
+      try {
+        const repaired = repairTruncatedJson(jsonSubstring);
+        const sanitizedRepaired = sanitizeJsonWithLatex(repaired);
+        return JSON.parse(sanitizedRepaired) as T;
+      } catch (err3) {
+        console.error('All JSON parse attempts failed:', { rawText, jsonSubstring, err1, err2, err3 });
+        throw new Error('Định dạng phản hồi từ AI không đúng cấu trúc JSON mong đợi. Vui lòng bấm thử lại hoặc bổ sung yêu cầu chi tiết hơn.');
+      }
     }
   }
 }
